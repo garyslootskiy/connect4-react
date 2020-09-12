@@ -8,7 +8,7 @@ class App extends Component {
   render() {
     return (
       <div>
-        <h1>Connect4</h1>
+        <h1><span className="tred">Conn</span>ect<span className="tred">4</span></h1>
         <Board />
       </div>
     );
@@ -21,17 +21,18 @@ class Board extends Component {
     super(props)
     this.state = {
       board: [
-        [0,0,0,1,0,0],
-        [0,0,1,0,0,0],
-        [0,1,0,0,0,2],
-        [0,0,0,0,2,0],
-        [0,0,0,2,0,0],
+        [0,0,0,0,0,0],
+        [0,0,0,0,0,0],
+        [0,0,0,0,0,0],
+        [0,0,0,0,0,0],
+        [0,0,0,0,0,0],
         [0,0,0,0,0,0]
       ],
       currentPlayer: 1,
     }
 
     this.dropPuck = this.dropPuck.bind(this);
+    this.clearBoard = this.clearBoard.bind(this);
   }
 
   dropPuck(columnNum) {
@@ -48,7 +49,31 @@ class Board extends Component {
       board: boardCopy,
       currentPlayer: (this.state.currentPlayer === 1) ? 2 : 1,
     })
+  }
+
+  componentDidUpdate() {
+    setTimeout(()=>{
     this.checkWinnner();
+    if(boardCopy.includes[0] === -1) {
+      alert("Theres a draw!!!!");
+      this.clearBoard;
+    }
+  }, 10
+    );
+  }
+
+  clearBoard() {
+    this.setState({
+      board: [
+        [0,0,0,0,0,0],
+        [0,0,0,0,0,0],
+        [0,0,0,0,0,0],
+        [0,0,0,0,0,0],
+        [0,0,0,0,0,0],
+        [0,0,0,0,0,0]
+      ],
+      currentPlayer: 1,
+    })
   }
 
   checkWinnner() {
@@ -69,53 +94,73 @@ class Board extends Component {
 
     // add diagonals
     // add middle diagonal
-    const currentLine1 = [];
-    const currentLine2 = [];
+    let currentLines = [[],[],[],[],[],[],[],[],[],[]]
     for(let i = 0; i < 6; ++i) {
-      currentLine1.push(board[i][i]);
-      currentLine2.push(board[i][5-i]);
+      currentLines[0].push(board[i][i]);
+      currentLines[1].push(board[i][5-i]);
     }
-    lines.push(currentLine1,currentLine2);
-
-    // add next diagonal
-    const currentLine3 = [];
-    const currentLine4 = [];
-    const currentLine3a = [];
-    const currentLine4a = [];
-    for(let i = 0; i < 5; ++i) {
-      currentLine3.push(board[i][i+1]);
-      currentLine4.push(board[i+1][i]);
-      currentLine3a.push(board[i][4-i]);
-      currentLine4a.push(board[5-i][i+1]);
-    }
-    lines.push(currentLine3,currentLine4,currentLine3a,currentLine4a);
     
     // add next diagonal
-    const currentLine5 = [];
-    const currentLine6 = [];
-    const currentLine5a = [];
-    const currentLine6a = [];
-    for(let i = 0; i < 4; ++i) {
-      currentLine5.push(board[i][i+2]);
-      currentLine6.push(board[i+2][i]);
-      currentLine5a.push(board[i][3-i]);
-      currentLine6a.push(board[5-i][i+2]);
+    for(let i = 0; i < 5; ++i) {
+      currentLines[2].push(board[i][i+1]);
+      currentLines[3].push(board[i+1][i]);
+      currentLines[4].push(board[i][4-i]);
+      currentLines[5].push(board[5-i][i+1]);
     }
-    lines.push(currentLine5,currentLine6,currentLine5a,currentLine6a);
+    
+    // add next diagonal
+    for(let i = 0; i < 4; ++i) {
+      currentLines[6].push(board[i][i+2]);
+      currentLines[7].push(board[i+2][i]);
+      currentLines[8].push(board[i][3-i]);
+      currentLines[9].push(board[5-i][i+2]);
+    }
+    lines = lines.concat(currentLines);
+
+    // check for 5 of a kind
+    for(let i = 0; i < lines.length; ++i) {
+      const line = lines[i];
+      let counter = 0;
+      let lastElem;
+      for (let j=0; j < line.length; ++j) {
+        const cell = line[j];
+        if (cell === 0) {
+          lastElem = 0;
+          counter = 0;
+        } else if(counter === 0) {
+          lastElem = cell;
+          counter += 1;
+        } else if (cell === lastElem) {
+          counter += 1;
+          if (counter === 4) {
+            alert (`${lastElem} wins!!!!`);
+            return;
+          }
+        } else {
+          lastElem = cell;
+          counter = 1;
+        }
+      }
+    }
   }
 
   render() {
     return (
   // state: 3D board array with columns and cells, current player
   // methods: drop puck passes down column array
-  <div className="board">
-    <Column column={this.state.board[0]} onClick={() => this.dropPuck(0)}/>
-    <Column column={this.state.board[1]} onClick={() => this.dropPuck(1)}/>
-    <Column column={this.state.board[2]} onClick={() => this.dropPuck(2)}/>
-    <Column column={this.state.board[3]} onClick={() => this.dropPuck(3)}/>
-    <Column column={this.state.board[4]} onClick={() => this.dropPuck(4)}/>
-    <Column column={this.state.board[5]} onClick={() => this.dropPuck(5)}/>
+  <div className="secclass">
+    <div className="board">
+      <Column column={this.state.board[0]} onClick={() => this.dropPuck(0)}/>
+      <Column column={this.state.board[1]} onClick={() => this.dropPuck(1)}/>
+      <Column column={this.state.board[2]} onClick={() => this.dropPuck(2)}/>
+      <Column column={this.state.board[3]} onClick={() => this.dropPuck(3)}/>
+      <Column column={this.state.board[4]} onClick={() => this.dropPuck(4)}/>
+      <Column column={this.state.board[5]} onClick={() => this.dropPuck(5)}/>
+    </div>
+    <span className="currentplayer">Current Player: {this.state.currentPlayer}</span>
+    <button onClick={this.clearBoard}>Reset Board</button>
   </div>
+
   );
 }
 }
@@ -152,3 +197,41 @@ const Cell = (props) => (
 
 
 render(<App />, document.querySelector('#root'));
+
+function getAllDiagnols(cells, v = 1, minLength = 0) {
+  const diagnols = [];
+
+  const stopCondition = v > 0 ? (val) => val < cells.length : (val) => val >= 0;
+  const start = v > 0 ? 0 : cells.length - 1;
+
+  // push the middle diagnol so that it doesn't get pushed twice in the loop
+  const diagMiddle = getDiagnol(cells, [start, start], [v, v]);
+  diagnols.push(diagMiddle);
+
+  for (let xy = start + v; stopCondition(xy); xy += v) {
+    if (xy < minLength - 1) continue;
+    const diag = getDiagnol(cells, [start, xy], [v, v]);
+    const diagMirrored = getDiagnol(cells, [xy, start], [v, v]);
+    diagnols.push(diag, diagMirrored);
+  }
+  return diagnols;
+}
+
+// function getDiagnol(cells, [originX, originY], [vx, vy]) {
+//   // Set up our for loop conditions based on our xy vector components
+//   const stopConditionX =
+//     vx > 0 ? (val) => val < cells.length : (val) => val >= 0;
+//   const stopConditionY =
+//     vy > 0 ? (val) => val < cells[0].length : (val) => val >= 0;
+
+//   let diagnol = [];
+//   for (
+//     let x = originX, y = originY;
+//     stopConditionX(x) && stopConditionY(y);
+//     x += vx, y += vy
+//   ) {
+//     diagnol.push(cells[x][y]);
+//   }
+
+//   return diagnol;
+// }
